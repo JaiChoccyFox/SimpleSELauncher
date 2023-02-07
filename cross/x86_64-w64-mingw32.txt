@@ -7,7 +7,7 @@ windres = 'x86_64-w64-mingw32-windres'
 exe_wrapper = 'wine64'
 
 [properties]
-needs_exe_wrapper = false
+needs_exe_wrapper = true
 
 [host_machine]
 system = 'windows'
