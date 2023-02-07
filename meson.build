@@ -9,6 +9,11 @@ platform = target_machine.system()
 linker_args = []
 
 if platform == 'windows'
+  add_project_arguments('-D_WIN32', language: 'cpp')
+  add_project_arguments('-D__WIN32__', language: 'cpp')
+  add_project_arguments('-DUNICODE', language: 'cpp')
+  add_project_arguments('-D_UNICODE', language: 'cpp')
+
   linker_args += [
     '-static',
     '-static-libgcc',
