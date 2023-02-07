@@ -16,6 +16,6 @@ if platform == 'windows'
   ]
 endif
 
-wx_dep = dependency('wxWidgets', native: true, modules: ['std', 'stc'])
+wx_dep = dependency('WxWidgets', native: true, modules: ['std', 'stc'])
 
 subdir('src')
