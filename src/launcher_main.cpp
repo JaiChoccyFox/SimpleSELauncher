@@ -19,12 +19,6 @@ namespace SimpleSELauncher
 
 		// Create the main application frame
 		m_pMainApplicationFrame = new MainApplicationFrame();
-		m_pMainApplicationFrame->CentreOnScreen();
-
-		// Fix the position of the Launcher frame, because for some reason it does not centre properly?
-		wxPoint framePos = m_pMainApplicationFrame->GetPosition();
-		wxSize frameSize = m_pMainApplicationFrame->GetSize();
-		m_pMainApplicationFrame->SetPosition(wxPoint(framePos.x - frameSize.x / 2, framePos.y - frameSize.y / 2));
 
 		// Load Splash PNG into memory
 		wxMemoryInputStream splashData(SPLASH_PNG, sizeof(SPLASH_PNG));
@@ -43,11 +37,12 @@ namespace SimpleSELauncher
 	// Splash screen closed
 	void MainApplication::OnSplashClose(wxCloseEvent& event)
 	{
-		// Skip the event (destroy the splash screen)
-		event.Skip();
-
 		// Show the main application frame
+		m_pMainApplicationFrame->CentreOnScreen();
 		m_pMainApplicationFrame->Show();
+
+		// Skip the event (destroys the splash screen)
+		event.Skip();
 	}
 }
 

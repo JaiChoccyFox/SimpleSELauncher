@@ -16,5 +16,11 @@ namespace SimpleSELauncher
 	{
 		public:
 			MainApplicationFrame();
+
+		private:
+			enum ButtonID
+			{
+				LaunchButtonID = 69  // Funny, right!?
+			};
 	};
 }
