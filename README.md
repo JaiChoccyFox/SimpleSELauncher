@@ -9,13 +9,15 @@ On Windows (MSYS2), make sure `Boost` & `wxWidgets` are available to satisfy the
 ```
 meson setup --strip --buildtype release --prefix "${PWD}/build.prefix" "build.win64"
 meson compile -C "build.win64"
-meson install -C "build.win64"```
+meson install -C "build.win64"
+```
 
 On Linux (w/ MinGW), make sure `Boost` & `wxWidgets` are available to satisfy the dependencies! Run the following to build:
 ```
 meson setup --strip --buildtype release --cross-file "./cross/x86_64-w64-mingw32.txt" --prefix "${PWD}/build.prefix" "build.win64"
 meson compile -C "build.win64"
-meson install -C "build.win64"```
+meson install -C "build.win64"
+```
 
 ## Installation
 Rename the default ***`SkyrimSELauncher.exe`*** to something like ***`SkyrimSELauncher.old.exe`*** and drag-and-drop this launcher into its place.
