@@ -13,9 +13,10 @@ Clicking "Launch" will bring up an additional window for you to select what appl
 
 You can launch any of these:
 * Mod Organizer
+* Nexus Mod Manager
+* SKSE64 Loader
 * Skyrim SE
 * Skyrim SE Launcher
 * Skyrim Together
 * Skyrim Together (Server)
 * Wyre Bash
-* Vortex
