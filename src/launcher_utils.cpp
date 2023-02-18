@@ -84,6 +84,7 @@ namespace SimpleSELauncher::utils
 		wchar_t* wcProgram = (wchar_t*)program.c_str();
 		wchar_t* wcArgs = (wchar_t*)args.c_str();
 		wchar_t* wcDir = (wchar_t*)dir.c_str();
+		filesys::path pCDir(filesys::current_path());
 		bool bWait = wait;
 #if defined(__WIN32__)
 		// Variables that hold information in relation to the created Process
@@ -98,6 +99,7 @@ namespace SimpleSELauncher::utils
 		ZeroMemory(&pi, sizeof(pi));
 
 		// Create the Process if possible
+		filesys::current_path(wcDir);
 		DWORD dwCreationFlags = bWait ? 0 : CREATE_NEW_PROCESS_GROUP;
 		if (CreateProcessW(wcProgram, wcArgs, NULL, NULL, FALSE, dwCreationFlags, NULL, wcDir, &si, &pi))
 		{
@@ -109,9 +111,11 @@ namespace SimpleSELauncher::utils
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);
 
+			filesys::current_path(pCDir);
 			return true;
 		}
 #endif
+		filesys::current_path(pCDir);
 		return false;
 	}
 }

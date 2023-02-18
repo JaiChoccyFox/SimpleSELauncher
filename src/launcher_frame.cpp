@@ -94,12 +94,16 @@ namespace SimpleSELauncher
 				choiceArray.Add(_T("Wyre Bash"));
 
 			MainSingleChoiceDialog choiceDialog(this, choiceArray);
-			if (choiceDialog.ShowModal() == wxID_OK)
+			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
 				std::filesystem::path exePath(utils::FindTargetExecutable(utils::PrettyNameToFileName(choiceDialog.GetStringSelection().ToStdString())));
-				if (std::filesystem::exists(exePath)
-					&& utils::ExecuteProgram(exePath.wstring(), L"", exePath.parent_path().wstring(), false))
+				if (utils::ExecuteProgram(exePath.wstring(), L"", exePath.parent_path().wstring(), false))
 					this->Close();
+			}
+			else if (choiceArray.IsEmpty())
+			{
+				wxMessageBox(_T("I found nothing..\n\nbut I found my coffee cup!"), _T("Nothing Found!"), wxOK | wxICON_ERROR, this);
+				choiceDialog.Destroy();
 			}
 		}, LaunchButtonID);
 		m_pVBoxSizer->Add(m_pLaunchButton, 0, wxALL, 5);
@@ -119,12 +123,16 @@ namespace SimpleSELauncher
 				choiceArray.Add(_T("MSVC++ Redistributable x86"));
 
 			MainSingleChoiceDialog choiceDialog(this, choiceArray);
-			if (choiceDialog.ShowModal() == wxID_OK)
+			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
 				std::filesystem::path exePath(utils::FindTargetExecutable(utils::PrettyNameToFileName(choiceDialog.GetStringSelection().ToStdString())));
-				if (std::filesystem::exists(exePath)
-					&& utils::ExecuteProgram(exePath.wstring(), L"/install /quiet /norestart", exePath.parent_path().wstring(), true))
-					choiceDialog.Close();
+				if (utils::ExecuteProgram(exePath.wstring(), L"/install /passive /norestart", exePath.parent_path().wstring(), true))
+					choiceDialog.Destroy();
+			}
+			else if (choiceArray.IsEmpty())
+			{
+				wxMessageBox(_T("I found nothing..\n\nbut I found my coffee cup!"), _T("Nothing Found!"), wxOK | wxICON_ERROR, this);
+				choiceDialog.Destroy();
 			}
 		}, MSVCButtonID);
 		m_pVBoxSizer->Add(m_pMSVCButton, 0, wxALL, 5);
@@ -138,7 +146,7 @@ namespace SimpleSELauncher
 			info.SetIcon(iconIco);
 			info.SetName(LAUNCHER_TITLE);
 			info.SetVersion(_T("v1.0"));
-			info.SetDescription(_T("This is a custom Launcher application for Skyrim SE.\nIt allows the user to override the default launch executable and launch another *known* application, such as Mod Organizer.\n\n\nwxWidgets is licensed under the 'wxWindows Library License'.\nSKYRIM is a trademark of ZeniMax Media Inc.."));
+			info.SetDescription(_T("This is a custom Launcher application for Skyrim SE.\nIt allows the user to override the default launch executable and launch another *known* application, such as Mod Organizer.\n\n\nwxWidgets is licensed under the 'wxWindows Library License'.\nBoost Library is licensed under the 'Boost Software License'.\nSKYRIM is a trademark of ZeniMax Media Inc.."));
 			info.SetCopyright(_T("(c) 2023 Jai \"Choccy\" Fox"));
 			wxAboutBox(info, this);
 		}, wxID_ABOUT);
