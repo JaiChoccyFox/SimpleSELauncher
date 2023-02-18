@@ -14,7 +14,7 @@
 
 namespace SimpleSELauncher
 {
-	class MainSplashScreen: public wxSplashScreen
+	class MainSplashScreen : public wxSplashScreen
 	{
 		public:
 			MainSplashScreen(const wxBitmap& bitmap);

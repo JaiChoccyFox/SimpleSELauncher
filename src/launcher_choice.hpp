@@ -12,16 +12,9 @@
 
 namespace SimpleSELauncher
 {
-	class MainApplicationFrame : public wxFrame
+	class MainSingleChoiceDialog : public wxSingleChoiceDialog
 	{
 		public:
-			MainApplicationFrame();
-
-		private:
-			enum ButtonID
-			{
-				LaunchButtonID = 69,  // Funny, right!?
-				MSVCButtonID = 70
-			};
+			MainSingleChoiceDialog(wxWindow* parent, const wxArrayString& choices);
 	};
 }

@@ -2,27 +2,30 @@
  *              Skyrim "Simple" SE Launcher
  *               (c) 2023 Jai "Choccy" Fox
  * ======================================================= */
+#include <filesystem>
 #include "wx/mstream.h"
 #include "wx/aboutdlg.h"
 #include "launcher_frame.hpp"
+#include "launcher_choice.hpp"
+#include "launcher_utils.hpp"
 
 // Embedded Icon PNG
 #include "res/launcher.png.h"
-
-// Embedded Title PNG
-#include "res/title.png.h"
 
 // Embedded Background JPEG
 #include "res/background.jpg.h"
 
 namespace SimpleSELauncher
 {
-	const wxString LAUNCHER_TITLE("Skyrim \"Simple\" SE Launcher");
+	const wxString LAUNCHER_TITLE(_T("Skyrim \"Simple\" SE Launcher"));
 
 	// Main application frame constructor
 	MainApplicationFrame::MainApplicationFrame()
-		: wxFrame(NULL, wxID_ANY, LAUNCHER_TITLE, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX))
+		: wxFrame(nullptr, wxID_ANY, LAUNCHER_TITLE, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX))
 	{
+		// Set the background colour
+		SetBackgroundColour(*wxBLACK);
+
 		// Load Icon PNG into memory
 		wxMemoryInputStream iconData(LAUNCHER_PNG, sizeof(LAUNCHER_PNG));
 		wxImage iconImg(iconData, wxBITMAP_TYPE_PNG);
@@ -45,40 +48,106 @@ namespace SimpleSELauncher
 		wxStaticBitmap* m_pStaticBackgroundBmp = new wxStaticBitmap(this, wxID_ANY, backgroundBmp);
 		m_pBoxSizer->Add(m_pStaticBackgroundBmp, 0, wxALL | wxEXPAND, 0);
 
-		// Load Title PNG into memory
-		wxMemoryInputStream titleData(TITLE_PNG, sizeof(TITLE_PNG));
-		wxImage titleImg(titleData, wxBITMAP_TYPE_PNG);
-		wxBitmap titleBmp(titleImg);
-
-		// Create a static bitmap to display the Title
-		wxStaticBitmap* m_pStaticTitleBmp = new wxStaticBitmap(this, wxID_ANY, titleBmp);
-
 		// Create a vertical BoxSizer for buttons
 		wxBoxSizer* m_pVBoxSizer = new wxBoxSizer(wxVERTICAL);
 
 		// Launch button, the first button visible on the Launcher
-		wxButton* m_pLaunchButton = new wxButton(this, LaunchButtonID, "&Launch!");
+		wxButton* m_pLaunchButton = new wxButton(this, LaunchButtonID, _T("&Launch!"));
+		m_pLaunchButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
+			// Lambda - open a choice dialog
+			wxArrayString choiceArray;
+
+			// Mod Organizer (2) - in case someone spells it like this
+			if (!utils::FindTargetExecutable("ModOrganiser").empty())
+				choiceArray.Add(_T("Mod Organiser"));
+
+			// Mod Organizer (2)
+			if (!utils::FindTargetExecutable("ModOrganizer").empty())
+				choiceArray.Add(_T("Mod Organizer"));
+
+			// Nexus Mod Manager
+			if (!utils::FindTargetExecutable("NMM").empty())
+				choiceArray.Add(_T("Nexus Mod Manager"));
+
+			// SKSE64 Loader
+			if (!utils::FindTargetExecutable("skse64_loader").empty())
+				choiceArray.Add(_T("SKSE64 Loader"));
+
+			// Skyrim SE (Vanilla)
+			if (!utils::FindTargetExecutable("SkyrimSE").empty())
+				choiceArray.Add(_T("Skyrim SE"));
+
+			// Skyrim SE Launcher (Vanilla)
+			if (!utils::FindTargetExecutable("SkyrimSELauncher").empty())
+				choiceArray.Add(_T("Skyrim SE Launcher"));
+
+			// Skyrim Together (Client)
+			if (!utils::FindTargetExecutable("SkyrimTogether").empty())
+				choiceArray.Add(_T("Skyrim Together"));
+
+			// Skyrim Together (Server)
+			if (!utils::FindTargetExecutable("SkyrimTogetherServer").empty())
+				choiceArray.Add(_T("Skyrim Together (Server)"));
+
+			// Wyre Bash
+			if (!utils::FindTargetExecutable("Wyre Bash").empty())
+				choiceArray.Add(_T("Wyre Bash"));
+
+			MainSingleChoiceDialog choiceDialog(this, choiceArray);
+			if (choiceDialog.ShowModal() == wxID_OK)
+			{
+				std::filesystem::path exePath(utils::FindTargetExecutable(utils::PrettyNameToFileName(choiceDialog.GetStringSelection().ToStdString())));
+				if (std::filesystem::exists(exePath)
+					&& utils::ExecuteProgram(exePath.wstring(), L"", exePath.parent_path().wstring(), false))
+					this->Close();
+			}
+		}, LaunchButtonID);
 		m_pVBoxSizer->Add(m_pLaunchButton, 0, wxALL, 5);
+
+		// MSVC button, the second button visible on the Launcher
+		wxButton* m_pMSVCButton = new wxButton(this, MSVCButtonID, _T("&MSVC++"));
+		m_pMSVCButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
+			// Lambda - open a choice dialog
+			wxArrayString choiceArray;
+
+			// MSVC++ Redistributable (x86-64)
+			if (!utils::FindTargetExecutable("VC_redist.x64.exe").empty())
+				choiceArray.Add(_T("MSVC++ Redistributable x64"));
+
+			// MSVC++ Redistributable (x86)
+			if (!utils::FindTargetExecutable("VC_redist.x86.exe").empty())
+				choiceArray.Add(_T("MSVC++ Redistributable x86"));
+
+			MainSingleChoiceDialog choiceDialog(this, choiceArray);
+			if (choiceDialog.ShowModal() == wxID_OK)
+			{
+				std::filesystem::path exePath(utils::FindTargetExecutable(utils::PrettyNameToFileName(choiceDialog.GetStringSelection().ToStdString())));
+				if (std::filesystem::exists(exePath)
+					&& utils::ExecuteProgram(exePath.wstring(), L"/install /quiet /norestart", exePath.parent_path().wstring(), true))
+					choiceDialog.Close();
+			}
+		}, MSVCButtonID);
+		m_pVBoxSizer->Add(m_pMSVCButton, 0, wxALL, 5);
 		m_pVBoxSizer->AddStretchSpacer(1);
 
-		// About button, the second button visible on the Launcher
-		wxButton* m_pAboutButton = new wxButton(this, wxID_ABOUT, "&About");
+		// About button, the third button visible on the Launcher
+		wxButton* m_pAboutButton = new wxButton(this, wxID_ABOUT, _T("&About"));
 		m_pAboutButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
 			// Lambda - create an About dialog window
 			wxAboutDialogInfo info;
 			info.SetIcon(iconIco);
 			info.SetName(LAUNCHER_TITLE);
-			info.SetVersion("v1.0");
-			info.SetDescription("This is a custom Launcher application for Skyrim SE. It allows the user to override the default launch executable and launch another *known* application, such as Mod Organizer.\n\n\nwxWidgets is licensed under the 'wxWindows Library License'.\nSKYRIM is a trademark of ZeniMax Media Inc..");
-			info.SetCopyright("(c) 2023 Jai \"Choccy\" Fox");
+			info.SetVersion(_T("v1.0"));
+			info.SetDescription(_T("This is a custom Launcher application for Skyrim SE.\nIt allows the user to override the default launch executable and launch another *known* application, such as Mod Organizer.\n\n\nwxWidgets is licensed under the 'wxWindows Library License'.\nSKYRIM is a trademark of ZeniMax Media Inc.."));
+			info.SetCopyright(_T("(c) 2023 Jai \"Choccy\" Fox"));
 			wxAboutBox(info, this);
 		}, wxID_ABOUT);
 		m_pVBoxSizer->Add(m_pAboutButton, 0, wxALL, 5);
 
 		// Exit button, the last button visible on the Launcher
-		wxButton* m_pExitButton = new wxButton(this, wxID_EXIT, "&Exit");
+		wxButton* m_pExitButton = new wxButton(this, wxID_EXIT, _T("&Exit"));
 		m_pExitButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
-			// Lambda - close the frame and stop the application
+			// Lambda - close the frame (stops the application)
 			this->Close();
 		}, wxID_EXIT);
 		m_pVBoxSizer->Add(m_pExitButton, 0, wxALL, 5);
@@ -88,9 +157,10 @@ namespace SimpleSELauncher
 		m_pBoxSizer->SetSizeHints(this);
 		this->SetSizerAndFit(m_pBoxSizer);
 
-		// HACK: centre the Title bitmap with the Background, this is dumb but I got segmentation faults with other methods
-		m_pStaticTitleBmp->SetParent(m_pStaticBackgroundBmp);
-		m_pStaticTitleBmp->CentreOnParent();
-		m_pStaticTitleBmp->SetParent(this);
+		// Disable the Launch & MSVC buttons on non-Windows platforms, in case someone does compile this for another platform
+#if !defined(__WIN32__)
+		m_pLaunchButton->Disable();
+		m_pMSVCButton->Disable();
+#endif
 	}
 }
