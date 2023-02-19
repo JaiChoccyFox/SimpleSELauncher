@@ -94,7 +94,7 @@ namespace SimpleSELauncher
 			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
 				const path choicePath(choiceDialog.GetStringSelection().wc_str());
-				spawn(filesystem::absolute(choicePath), start_dir(filesystem::absolute(choicePath.parent_path())));
+				spawn(filesystem::canonical(choicePath), start_dir(filesystem::canonical(choicePath.parent_path())));
 				this->Close();
 			}
 			else if (choiceArray.IsEmpty())
@@ -128,7 +128,7 @@ namespace SimpleSELauncher
 			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
 				const path choicePath(choiceDialog.GetStringSelection().wc_str());
-				child cp(filesystem::absolute(choicePath), "/install /passive /norestart", start_dir(filesystem::absolute(choicePath.parent_path())));
+				child cp(filesystem::canonical(choicePath), "/install /passive /norestart", start_dir(filesystem::canonical(choicePath.parent_path())));
 				while (cp.running())
 					wxSleep(1);
 				cp.wait();
