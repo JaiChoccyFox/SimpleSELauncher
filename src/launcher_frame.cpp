@@ -24,6 +24,7 @@ using std::array;
 using std::vector;
 using process::spawn;
 using process::child;
+using process::start_dir;
 using dll::program_location;
 using filesystem::path;
 
@@ -92,7 +93,8 @@ namespace SimpleSELauncher
 			MainSingleChoiceDialog choiceDialog(this, choiceArray);
 			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
-				spawn(path(choiceDialog.GetStringSelection().wc_str()));
+				const path choicePath(choiceDialog.GetStringSelection().wc_str());
+				spawn(filesystem::absolute(choicePath), start_dir(filesystem::absolute(choicePath.parent_path())));
 				this->Close();
 			}
 			else if (choiceArray.IsEmpty())
@@ -125,7 +127,8 @@ namespace SimpleSELauncher
 			MainSingleChoiceDialog choiceDialog(this, choiceArray);
 			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
-				child cp(path(choiceDialog.GetStringSelection().wc_str()), L"/install /passive /norestart");
+				const path choicePath(choiceDialog.GetStringSelection().wc_str());
+				child cp(filesystem::absolute(choicePath), "/install /passive /norestart", start_dir(filesystem::absolute(choicePath.parent_path())));
 				while (cp.running())
 					wxSleep(1);
 				cp.wait();
