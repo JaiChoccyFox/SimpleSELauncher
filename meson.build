@@ -1,5 +1,5 @@
 project('SimpleSELauncher', 'cpp', version: 'v1.0', meson_version: '>=0.56.0', default_options: [
-  'cpp_std=c++20',
+  'cpp_std=c++17',
   'warning_level=3'
 ])
 
