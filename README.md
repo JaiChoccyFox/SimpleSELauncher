@@ -2,7 +2,7 @@
 **Skyrim "Simple" SE Launcher** is a custom launcher for *Skyrim Special Edition*.
 It acts as a drop-in replacement for the already existing ***`SkyrimSELauncher.exe`*** executable that can be located in the main installation directory.
 
-It's simple but allows for users to choose what they wish to launch, and may prove useful for users who use Linux + Proton.
+It's simple but allows for users to choose what they wish to launch rather than the vanilla launcher, and may prove useful for users who use Linux + Proton.
 
 ## Building
 On Windows (MSYS2), make sure `Boost` & `wxWidgets` are available to satisfy the dependencies! Run the following to build:
@@ -20,13 +20,15 @@ meson install -C "build.win64"
 ```
 
 ## Installation
-Rename the default ***`SkyrimSELauncher.exe`*** to something like ***`SkyrimSELauncher.old.exe`*** and drag-and-drop this launcher into its place.
+Rename the default ***`SkyrimSELauncher.exe`*** to something like ***`SkyrimSELauncher.old.exe`***/***`SkyrimSELauncher.bak.exe`*** and drag-and-drop this launcher into its place.
 
 Once you complete the step, a different window should appear.
-Clicking "Launch" will bring up an additional window for you to select what application to execute (if it exists.)
+Clicking "Launch" will bring up an additional window for you to select what application to execute (if it exists in the directory tree from the launcher.)
+
+**Note: executables must be a PORTABLE installation!**
 
 
-You can launch any of these:
+You can (portably) launch any of these:
 * Mod Organizer
 * Nexus Mod Manager
 * SKSE64 Loader
