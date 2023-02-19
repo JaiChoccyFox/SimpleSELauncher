@@ -4,10 +4,10 @@
  * ======================================================= */
 #pragma once
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #if !defined(WX_PRECOMP)
-	#include "wx/wx.h"
+	#include <wx/wx.h>
 #endif
 
 namespace SimpleSELauncher
@@ -18,7 +18,7 @@ namespace SimpleSELauncher
 			virtual bool OnInit();
 
 		private:
-			wxFrame* m_pMainApplicationFrame;
-			void OnSplashClose(wxCloseEvent& event);
+			wxFrame *m_pMainApplicationFrame;
+			void OnSplashClose(wxCloseEvent &event);
 	};
 }

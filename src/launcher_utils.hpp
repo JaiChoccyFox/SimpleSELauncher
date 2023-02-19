@@ -4,12 +4,10 @@
  * ======================================================= */
 #pragma once
 
-#include <string>
+#include <vector>
+#include <boost/dll.hpp>
 
 namespace SimpleSELauncher::utils
 {
-	std::string PrettyNameToFileName(const std::string& name);
-	std::string FindTargetExecutable(const std::string& filename);
-
-	bool ExecuteProgram(const std::wstring& program, const std::wstring& args, const std::wstring& dir, bool wait);
+	void FindTargetExecutable(const boost::filesystem::path &directory, const boost::filesystem::path &file_name, std::vector<boost::filesystem::path> &vec);
 }

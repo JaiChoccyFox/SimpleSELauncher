@@ -4,19 +4,19 @@
  * ======================================================= */
 #pragma once
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #if !defined(WX_PRECOMP)
-	#include "wx/wx.h"
+	#include <wx/wx.h>
 #endif
 
-#include "wx/splash.h"
+#include <wx/splash.h>
 
 namespace SimpleSELauncher
 {
 	class MainSplashScreen : public wxSplashScreen
 	{
 		public:
-			MainSplashScreen(const wxBitmap& bitmap);
+			MainSplashScreen(const wxBitmap &bitmap);
 	};
 }

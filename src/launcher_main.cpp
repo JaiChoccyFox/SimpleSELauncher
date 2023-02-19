@@ -2,7 +2,7 @@
  *              Skyrim "Simple" SE Launcher
  *               (c) 2023 Jai "Choccy" Fox
  * ======================================================= */
-#include "wx/mstream.h"
+#include <wx/mstream.h>
 #include "launcher_main.hpp"
 #include "launcher_splash.hpp"
 #include "launcher_frame.hpp"
@@ -26,7 +26,7 @@ namespace SimpleSELauncher
 		wxBitmap splashBmp(splashImg);
 
 		// Create a Splash Screen
-		wxSplashScreen* m_pSplashScreen = new MainSplashScreen(splashBmp);
+		wxSplashScreen *m_pSplashScreen = new MainSplashScreen(splashBmp);
 		m_pSplashScreen->Bind(wxEVT_CLOSE_WINDOW, &MainApplication::OnSplashClose, this);
 		wxYield();
 

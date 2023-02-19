@@ -2,9 +2,10 @@
  *              Skyrim "Simple" SE Launcher
  *               (c) 2023 Jai "Choccy" Fox
  * ======================================================= */
-#include <filesystem>
-#include "wx/mstream.h"
-#include "wx/aboutdlg.h"
+#include <array>
+#include <boost/process.hpp>
+#include <wx/mstream.h>
+#include <wx/aboutdlg.h>
 #include "launcher_frame.hpp"
 #include "launcher_choice.hpp"
 #include "launcher_utils.hpp"
@@ -14,6 +15,17 @@
 
 // Embedded Background JPEG
 #include "res/background.jpg.h"
+
+namespace process = boost::process;
+namespace dll = boost::dll;
+namespace filesystem = boost::filesystem;
+using std::wstring;
+using std::array;
+using std::vector;
+using process::spawn;
+using process::child;
+using dll::program_location;
+using filesystem::path;
 
 namespace SimpleSELauncher
 {
@@ -37,7 +49,7 @@ namespace SimpleSELauncher
 		SetIcon(iconIco);
 
 		// Create a BoxSizer for the Launcher layout
-		wxBoxSizer* m_pBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+		wxBoxSizer *m_pBoxSizer = new wxBoxSizer(wxHORIZONTAL);
 
 		// Load Background JPEG into memory
 		wxMemoryInputStream backgroundData(BACKGROUND_JPG, sizeof(BACKGROUND_JPG));
@@ -45,60 +57,43 @@ namespace SimpleSELauncher
 		wxBitmap backgroundBmp(backgroundImg);
 
 		// Create a static bitmap to display the Background
-		wxStaticBitmap* m_pStaticBackgroundBmp = new wxStaticBitmap(this, wxID_ANY, backgroundBmp);
+		wxStaticBitmap *m_pStaticBackgroundBmp = new wxStaticBitmap(this, wxID_ANY, backgroundBmp);
 		m_pBoxSizer->Add(m_pStaticBackgroundBmp, 0, wxALL | wxEXPAND, 0);
 
 		// Create a vertical BoxSizer for buttons
-		wxBoxSizer* m_pVBoxSizer = new wxBoxSizer(wxVERTICAL);
+		wxBoxSizer *m_pVBoxSizer = new wxBoxSizer(wxVERTICAL);
 
 		// Launch button, the first button visible on the Launcher
-		wxButton* m_pLaunchButton = new wxButton(this, LaunchButtonID, _T("&Launch!"));
-		m_pLaunchButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
+		wxButton *m_pLaunchButton = new wxButton(this, LaunchButtonID, _T("&Launch!"));
+		m_pLaunchButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent &WXUNUSED(event)) {
 			// Lambda - open a choice dialog
+			const array<wstring, 11> nameArray = {
+				L"ModOrganiser.",
+				L"ModOrganizer.",
+				L"NMM-",
+				L"skse64_loader.",
+				L"SkyrimSE.",
+				L"SkyrimSELauncher.",
+				L"SkyrimTogether.",
+				L"SkyrimTogetherServer.",
+				L"Vortex.",
+				L"WyreBash.",
+				L"Wyre Bash."
+			};
+			vector<path> choiceVector;
 			wxArrayString choiceArray;
 
-			// Mod Organizer (2) - in case someone spells it like this
-			if (!utils::FindTargetExecutable("ModOrganiser").empty())
-				choiceArray.Add(_T("Mod Organiser"));
+			for (const wstring &s : nameArray)
+				utils::FindTargetExecutable(program_location().parent_path(), s, choiceVector);
 
-			// Mod Organizer (2)
-			if (!utils::FindTargetExecutable("ModOrganizer").empty())
-				choiceArray.Add(_T("Mod Organizer"));
-
-			// Nexus Mod Manager
-			if (!utils::FindTargetExecutable("NMM").empty())
-				choiceArray.Add(_T("Nexus Mod Manager"));
-
-			// SKSE64 Loader
-			if (!utils::FindTargetExecutable("skse64_loader").empty())
-				choiceArray.Add(_T("SKSE64 Loader"));
-
-			// Skyrim SE (Vanilla)
-			if (!utils::FindTargetExecutable("SkyrimSE").empty())
-				choiceArray.Add(_T("Skyrim SE"));
-
-			// Skyrim SE Launcher (Vanilla)
-			if (!utils::FindTargetExecutable("SkyrimSELauncher").empty())
-				choiceArray.Add(_T("Skyrim SE Launcher"));
-
-			// Skyrim Together (Client)
-			if (!utils::FindTargetExecutable("SkyrimTogether").empty())
-				choiceArray.Add(_T("Skyrim Together"));
-
-			// Skyrim Together (Server)
-			if (!utils::FindTargetExecutable("SkyrimTogetherServer").empty())
-				choiceArray.Add(_T("Skyrim Together (Server)"));
-
-			// Wyre Bash
-			if (!utils::FindTargetExecutable("Wyre Bash").empty())
-				choiceArray.Add(_T("Wyre Bash"));
+			for (const path &p : choiceVector)
+				choiceArray.Add(filesystem::relative(p).native());
 
 			MainSingleChoiceDialog choiceDialog(this, choiceArray);
 			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
-				std::filesystem::path exePath(utils::FindTargetExecutable(utils::PrettyNameToFileName(choiceDialog.GetStringSelection().ToStdString())));
-				if (utils::ExecuteProgram(exePath.wstring(), L"", exePath.parent_path().wstring(), false))
-					this->Close();
+				spawn(path(choiceDialog.GetStringSelection().wc_str()));
+				this->Close();
 			}
 			else if (choiceArray.IsEmpty())
 			{
@@ -109,25 +104,32 @@ namespace SimpleSELauncher
 		m_pVBoxSizer->Add(m_pLaunchButton, 0, wxALL, 5);
 
 		// MSVC button, the second button visible on the Launcher
-		wxButton* m_pMSVCButton = new wxButton(this, MSVCButtonID, _T("&MSVC++"));
-		m_pMSVCButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
+		wxButton *m_pMSVCButton = new wxButton(this, MSVCButtonID, _T("&MSVC++"));
+		m_pMSVCButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent &WXUNUSED(event)) {
 			// Lambda - open a choice dialog
+			const array<wstring, 4> nameArray = {
+				L"VC_redist.x64.",
+				L"VC_redist.x86.",
+				L"vcredist_x64.",
+				L"vcredist_x86."
+			};
+			vector<path> choiceVector;
 			wxArrayString choiceArray;
 
-			// MSVC++ Redistributable (x86-64)
-			if (!utils::FindTargetExecutable("VC_redist.x64.exe").empty())
-				choiceArray.Add(_T("MSVC++ Redistributable x64"));
+			for (const wstring &str : nameArray)
+				utils::FindTargetExecutable(program_location().parent_path(), str, choiceVector);
 
-			// MSVC++ Redistributable (x86)
-			if (!utils::FindTargetExecutable("VC_redist.x86.exe").empty())
-				choiceArray.Add(_T("MSVC++ Redistributable x86"));
+			for (const path &p : choiceVector)
+				choiceArray.Add(filesystem::relative(p).native());
 
 			MainSingleChoiceDialog choiceDialog(this, choiceArray);
 			if (!choiceArray.IsEmpty() && choiceDialog.ShowModal() == wxID_OK)
 			{
-				std::filesystem::path exePath(utils::FindTargetExecutable(utils::PrettyNameToFileName(choiceDialog.GetStringSelection().ToStdString())));
-				if (utils::ExecuteProgram(exePath.wstring(), L"/install /passive /norestart", exePath.parent_path().wstring(), true))
-					choiceDialog.Destroy();
+				child cp(path(choiceDialog.GetStringSelection().wc_str()), L"/install /passive /norestart");
+				while (cp.running())
+					wxSleep(1);
+				cp.wait();
+				choiceDialog.Destroy();
 			}
 			else if (choiceArray.IsEmpty())
 			{
@@ -139,8 +141,8 @@ namespace SimpleSELauncher
 		m_pVBoxSizer->AddStretchSpacer(1);
 
 		// About button, the third button visible on the Launcher
-		wxButton* m_pAboutButton = new wxButton(this, wxID_ABOUT, _T("&About"));
-		m_pAboutButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
+		wxButton *m_pAboutButton = new wxButton(this, wxID_ABOUT, _T("&About"));
+		m_pAboutButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent &WXUNUSED(event)) {
 			// Lambda - create an About dialog window
 			wxAboutDialogInfo info;
 			info.SetIcon(iconIco);
@@ -153,8 +155,8 @@ namespace SimpleSELauncher
 		m_pVBoxSizer->Add(m_pAboutButton, 0, wxALL, 5);
 
 		// Exit button, the last button visible on the Launcher
-		wxButton* m_pExitButton = new wxButton(this, wxID_EXIT, _T("&Exit"));
-		m_pExitButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent& WXUNUSED(event)) {
+		wxButton *m_pExitButton = new wxButton(this, wxID_EXIT, _T("&Exit"));
+		m_pExitButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent &WXUNUSED(event)) {
 			// Lambda - close the frame (stops the application)
 			this->Close();
 		}, wxID_EXIT);

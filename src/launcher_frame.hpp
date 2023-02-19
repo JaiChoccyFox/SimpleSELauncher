@@ -4,10 +4,10 @@
  * ======================================================= */
 #pragma once
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 
 #if !defined(WX_PRECOMP)
-	#include "wx/wx.h"
+	#include <wx/wx.h>
 #endif
 
 namespace SimpleSELauncher
