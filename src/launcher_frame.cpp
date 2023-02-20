@@ -78,8 +78,8 @@ namespace SimpleSELauncher
 				L"SkyrimTogether.",
 				L"SkyrimTogetherServer.",
 				L"Vortex.",
-				L"WyreBash.",
-				L"Wyre Bash."
+				L"WryeBash.",
+				L"Wrye Bash."
 			};
 			vector<path> choiceVector;
 			wxArrayString choiceArray;
