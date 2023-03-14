@@ -68,7 +68,8 @@ namespace SimpleSELauncher
 		wxButton *m_pLaunchButton = new wxButton(this, LaunchButtonID, _T("&Launch!"));
 		m_pLaunchButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [=](wxCommandEvent &WXUNUSED(event)) {
 			// Lambda - open a choice dialog
-			const array<wstring, 11> nameArray = {
+			const array<wstring, 12> nameArray = {
+				L"LOOT.",
 				L"ModOrganiser.",
 				L"ModOrganizer.",
 				L"NMM-",
